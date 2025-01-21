@@ -177,7 +177,16 @@ def prepare(args):
     else:
         nonce = args.nonce
     if args.start_instance:
-        return start_translator_client_proc(args.host, args.port + 1, nonce, args)
+        #num_instances = args.num_instances if hasattr(args, 'num_instances') else 2
+        num_instances = 2
+        processes = []
+        
+        # 遍历启动多个实例
+        for i in range(num_instances):
+            port = args.port + i + 1
+            proc = start_translator_client_proc(args.host, port, nonce, args)
+            processes.append(proc)
+        return processes
     folder_name= "upload-cache"
     if os.path.exists(folder_name):
         shutil.rmtree(folder_name)
@@ -193,10 +202,11 @@ if __name__ == '__main__':
 
     args = parse_arguments()
     args.start_instance = True
-    proc = prepare(args)
+    procs = prepare(args)
     print("Nonce: "+nonce)
     try:
         uvicorn.run(app, host=args.host, port=args.port)
     except Exception:
-        if proc:
-            proc.terminate()
+        if procs:
+            for proc in procs:
+                proc.terminate()
