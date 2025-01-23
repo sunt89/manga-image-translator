@@ -18,7 +18,7 @@ from pathlib import Path
 from manga_translator import Config
 from server.instance import ExecutorInstance, executor_instances
 from server.myqueue import task_queue
-from server.request_extraction import get_ctx, while_streaming, TranslateRequest
+from server.request_extraction import get_ctx, convert_to_rgb, while_streaming, TranslateRequest
 from server.to_json import to_translation, TranslationResponse
 
 app = FastAPI()
@@ -64,10 +64,12 @@ async def bytes(req: Request, data: TranslateRequest):
 async def image(req: Request, data: TranslateRequest) -> StreamingResponse:
     ctx = await get_ctx(req, data.config, data.image)
     img_byte_arr = io.BytesIO()
-    ctx.result.save(img_byte_arr, format="PNG")
+    rgb_image = convert_to_rgb(ctx.result)
+    rgb_image.save(img_byte_arr, format="JPEG", quality=80)
+    #ctx.result.save(img_byte_arr, format="JPEG")
     img_byte_arr.seek(0)
 
-    return StreamingResponse(img_byte_arr, media_type="image/png")
+    return StreamingResponse(img_byte_arr, media_type="image/jpeg")
 
 @app.post("/translate/json/stream", response_class=StreamingResponse,tags=["api", "json"], response_description="A stream over elements with strucure(1byte status, 4 byte size, n byte data) status code are 0,1,2,3,4 0 is result data, 1 is progress report, 2 is error, 3 is waiting queue position, 4 is waiting for translator instance")
 async def stream_json(req: Request, data: TranslateRequest) -> StreamingResponse:
@@ -98,10 +100,12 @@ async def image_form(req: Request, image: UploadFile = File(...), config: str = 
     img = await image.read()
     ctx = await get_ctx(req, Config.parse_raw(config), img)
     img_byte_arr = io.BytesIO()
-    ctx.result.save(img_byte_arr, format="PNG")
+    rgb_image = convert_to_rgb(ctx.result)
+    rgb_image.save(img_byte_arr, format="JPEG", quality=80)
+    #ctx.result.save(img_byte_arr, format="JPEG")
     img_byte_arr.seek(0)
 
-    return StreamingResponse(img_byte_arr, media_type="image/png")
+    return StreamingResponse(img_byte_arr, media_type="image/jpeg")
 
 @app.post("/translate/with-form/json/stream", response_class=StreamingResponse, tags=["api", "form"],response_description="A stream over elements with strucure(1byte status, 4 byte size, n byte data) status code are 0,1,2,3,4 0 is result data, 1 is progress report, 2 is error, 3 is waiting queue position, 4 is waiting for translator instance")
 async def stream_json_form(req: Request, image: UploadFile = File(...), config: str = Form("{}")) -> StreamingResponse:
@@ -177,8 +181,7 @@ def prepare(args):
     else:
         nonce = args.nonce
     if args.start_instance:
-        #num_instances = args.num_instances if hasattr(args, 'num_instances') else 2
-        num_instances = 2
+        num_instances = int(os.getenv('NUM_INSTANCES', "1"))
         processes = []
         
         # 遍历启动多个实例

@@ -2,6 +2,7 @@ import asyncio
 import builtins
 import io
 import re
+from PIL import Image
 from base64 import b64decode
 from typing import Union
 
@@ -40,6 +41,14 @@ async def to_pil_image(image: Union[str, bytes]) -> Image.Image:
     except Exception as e:
         raise HTTPException(status_code=422, detail=str(e))
 
+def convert_to_rgb(image: Image.Image, background_color: tuple = (255, 255, 255)) -> Image.Image:
+    if image.mode == 'RGBA':
+        background = Image.new('RGB', image.size, background_color)
+        background.paste(image, mask=image.split()[3])
+        return background
+    elif image.mode != 'RGB':
+        return image.convert('RGB')
+    return image
 
 async def get_ctx(req: Request, config: Config, image: str|bytes):
     image = await to_pil_image(image)
