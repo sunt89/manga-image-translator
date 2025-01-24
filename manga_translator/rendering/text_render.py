@@ -153,6 +153,9 @@ FALLBACK_FONTS = [
     os.path.join(BASE_PATH, 'fonts/Arial-Unicode-Regular.ttf'),
     os.path.join(BASE_PATH, 'fonts/msyh.ttc'),
     os.path.join(BASE_PATH, 'fonts/msgothic.ttc'),
+    os.path.join(BASE_PATH, 'fonts/anime_ace.ttf'),
+    os.path.join(BASE_PATH, 'fonts/anime_ace_3.ttf'),
+    os.path.join(BASE_PATH, 'fonts/comic shanns 2.ttf'),
 ]
 FONT_SELECTION: List[freetype.Face] = []
 font_cache = {}
