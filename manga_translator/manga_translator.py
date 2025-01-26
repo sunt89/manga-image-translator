@@ -630,6 +630,12 @@ class MangaTranslator:
 
     async def _run_text_rendering(self, config: Config, ctx: Context):
         logger.info("_run_text_rendering")
+        self.font_path = 'fonts\\' + config.render.font_name + '.ttf'
+        # 判断文件是否存在
+        if not os.path.exists(self.font_path):
+            logger.info(f'Font file not found: {self.font_path}')
+            self.font_path = ''
+        
         if config.render.renderer == Renderer.none:
             output = ctx.img_inpainted
         # manga2eng currently only supports horizontal left to right rendering
@@ -637,16 +643,6 @@ class MangaTranslator:
                 ctx.text_regions[0].target_lang) == 'h':
             output = await dispatch_eng_render(ctx.img_inpainted, ctx.img_rgb, ctx.text_regions, self.font_path, config.render.line_spacing)
         else:
-            logger.info("dispatch_rendering")
-            logger.info(f'config.render.font_size: {config.render.font_size}')
-            logger.info(f'config.render.font_name: {config.render.font_name}')
-            logger.info(f'config.render.font_size_minimum: {config.render.font_size_minimum}')
-            # self.font_path = 'fonts\ZCOOLQingKeHuangYou-Regular.ttf'
-            self.font_path = 'fonts\\' + config.render.font_name + '.ttf'
-            # 判断文件是否存在
-            if not os.path.exists(self.font_path):
-                logger.info(f'Font file not found: {self.font_path}')
-                self.font_path = ''
             output = await dispatch_rendering(ctx.img_inpainted, ctx.text_regions, self.font_path, config.render.font_size,
                                               config.render.font_size_offset,
                                               config.render.font_size_minimum, not config.render.no_hyphenation, ctx.render_mask, config.render.line_spacing)
