@@ -630,11 +630,13 @@ class MangaTranslator:
 
     async def _run_text_rendering(self, config: Config, ctx: Context):
         logger.info("_run_text_rendering")
-        self.font_path = 'fonts\\' + config.render.font_name + '.ttf'
+        self.font_path = os.path.join('fonts', f"{config.render.font_name}.ttf")
         # 判断文件是否存在
         if not os.path.exists(self.font_path):
-            logger.info(f'Font file not found: {self.font_path}')
-            self.font_path = ''
+            self.font_path = os.path.join('fonts', f"{config.render.font_name}.ttc")
+            if not os.path.exists(self.font_path):
+                logger.info(f'Font file not found: {self.font_path}')
+                self.font_path = ''
         
         if config.render.renderer == Renderer.none:
             output = ctx.img_inpainted
