@@ -203,7 +203,7 @@ class Glyph:
         self.metrics.horiAdvance = glyph.metrics.horiAdvance
         self.metrics.vertAdvance = glyph.metrics.vertAdvance
 
-@functools.lru_cache(maxsize = 1024, typed = True)
+#@functools.lru_cache(maxsize = 1024, typed = True)
 def get_char_glyph(cdpt: str, font_size: int, direction: int) -> Glyph:
     global FONT_SELECTION
     for i, face in enumerate(FONT_SELECTION):
