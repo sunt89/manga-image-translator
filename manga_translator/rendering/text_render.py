@@ -153,9 +153,6 @@ FALLBACK_FONTS = [
     os.path.join(BASE_PATH, 'fonts/Arial-Unicode-Regular.ttf'),
     os.path.join(BASE_PATH, 'fonts/msyh.ttc'),
     os.path.join(BASE_PATH, 'fonts/msgothic.ttc'),
-    os.path.join(BASE_PATH, 'fonts/anime_ace.ttf'),
-    os.path.join(BASE_PATH, 'fonts/anime_ace_3.ttf'),
-    os.path.join(BASE_PATH, 'fonts/comic shanns 2.ttf'),
 ]
 FONT_SELECTION: List[freetype.Face] = []
 font_cache = {}
@@ -167,13 +164,22 @@ def get_cached_font(path: str) -> freetype.Face:
         font_cache[path] = freetype.Face(Path(path).open('rb'))
     return font_cache[path]
 
+def load_font(path: str) -> freetype.Face:
+    """
+    Directly load the font file without caching.
+    """
+    path = path.replace('\\', '/')
+    return freetype.Face(Path(path).open('rb'))
+
 def set_font(font_path: str):
     global FONT_SELECTION
+    print("set_font: " + font_path)
     if font_path:
         selection = [font_path] + FALLBACK_FONTS
     else:
         selection = FALLBACK_FONTS
-    FONT_SELECTION = [get_cached_font(p) for p in selection]
+    # FONT_SELECTION = [get_cached_font(p) for p in selection]
+    FONT_SELECTION = [load_font(p) for p in selection]
 
 class namespace:
     pass

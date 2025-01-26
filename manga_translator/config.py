@@ -169,6 +169,10 @@ class RenderConfig(BaseModel):
     line_spacing: Optional[int] = None
     """Line spacing is font_size * this value. Default is 0.01 for horizontal text and 0.2 for vertical."""
     font_size: Optional[int] = None
+    
+    """Specify the font name"""
+    font_name: str = ''
+    
     """Use fixed font size for rendering"""
     _font_color_fg = None
     _font_color_bg = None
