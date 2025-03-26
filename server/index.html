@@ -429,7 +429,8 @@
 
           const config = `{
           "detector": {
-            "detector": "${this.textDetector}"
+            "detector": "${this.textDetector}",
+            "detection_size": 1536
           },
           "render": {
             "font_name": "${this.renderFontName}",
@@ -443,7 +444,8 @@
             "ocr": "48px"
           },
           "inpainter": {
-            "inpainter": "default"
+            "inpainter": "default",
+            "inpainting_precision": "fp32"
           }
         }`;
 
