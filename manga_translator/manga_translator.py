@@ -761,6 +761,13 @@ class MangaTranslator:
                                          self.verbose)
 
     async def _run_text_rendering(self, config: Config, ctx: Context):
+        self.font_path = os.path.join('fonts', f"{config.render.font_name}.ttf")
+        # 判断文件是否存在
+        if not os.path.exists(self.font_path):
+            self.font_path = os.path.join('fonts', f"{config.render.font_name}.ttc")
+            if not os.path.exists(self.font_path):
+                logger.info(f'Font file not found: {self.font_path}')
+                self.font_path = ''
         current_time = time.time()
         self._model_usage_timestamps[("rendering", config.render.renderer)] = current_time
         if config.render.renderer == Renderer.none:
