@@ -88,18 +88,23 @@ async def wait_in_queue(task: QueueElement, notify: NotifyType):
 
             instance = await executor_instances.find_executor()
             await task_queue.remove(task)
-            if notify:
-                notify(4, b"")
-            if notify:
-                await instance.sent_stream(task.image, task.config, notify)
-            else:
-                result = await instance.sent(task.image, task.config)
 
-            await executor_instances.free_executor(instance)
+            try:
+                if notify:
+                    notify(4, b"")
+                if notify:
+                    await instance.sent_stream(task.image, task.config, notify)
+                else:
+                    result = await instance.sent(task.image, task.config)
 
-            if notify:
-                return
-            else:
-                return result
+                await executor_instances.free_executor(instance)
+
+                if notify:
+                    return
+                else:
+                    return result
+            except:
+                await executor_instances.free_executor(instance)
+                raise
         else:
             await task_queue.wait_for_event()
