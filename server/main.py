@@ -36,7 +36,7 @@ app.add_middleware(
 async def register_instance(instance: ExecutorInstance, req: Request, req_nonce: str = Header(alias="X-Nonce")):
     if req_nonce != nonce:
         raise HTTPException(401, detail="Invalid nonce")
-    instance.ip = req.client.host
+    #instance.ip = req.client.host
     executor_instances.register(instance)
 
 def transform_to_image(ctx):
